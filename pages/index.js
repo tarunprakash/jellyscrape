@@ -263,7 +263,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>✨ JellySCRAPE Magic! ✨</title>
+        <title>✨ JellySCRAPE! ✨</title>
         <meta name="description" content="The cutest way to scrape reviews from Sephora! 💖" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
