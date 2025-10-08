@@ -1,40 +1,11 @@
 import { useState } from 'react'
 import Head from 'next/head'
+import ConfettiExplosion from 'react-confetti-explosion'
 import styles from '../styles/Home.module.css'
 
 // Exponential backoff utility function
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Confetti celebration function
-const triggerConfetti = () => {
-  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#ffb6c1', '#ff69b4']
-  const confettiCount = 150
-  
-  for (let i = 0; i < confettiCount; i++) {
-    setTimeout(() => {
-      const confetti = document.createElement('div')
-      confetti.style.position = 'fixed'
-      confetti.style.width = '10px'
-      confetti.style.height = '10px'
-      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      confetti.style.left = Math.random() * 100 + 'vw'
-      confetti.style.top = '-10px'
-      confetti.style.borderRadius = '50%'
-      confetti.style.pointerEvents = 'none'
-      confetti.style.zIndex = '9999'
-      confetti.style.animation = 'confettiFall 3s linear forwards'
-      
-      document.body.appendChild(confetti)
-      
-      // Remove confetti after animation
-      setTimeout(() => {
-        if (confetti.parentNode) {
-          confetti.parentNode.removeChild(confetti)
-        }
-      }, 3000)
-    }, i * 10)
-  }
-}
 
 const fetchWithRetry = async (url, options = {}, maxRetries = 3, baseDelay = 1000) => {
   let lastError
@@ -84,6 +55,7 @@ export default function Home() {
   const [extractedReviews, setExtractedReviews] = useState([])
   const [paginationInfo, setPaginationInfo] = useState(null)
   const [currentPage, setCurrentPage] = useState(0)
+  const [isExploding, setIsExploding] = useState(false)
 
   const fetchReviews = async (pid, offset = 0, limit = 100, onRetry = null) => {
     const baseUrl = 'https://api.bazaarvoice.com/data/reviews.json'
@@ -276,7 +248,9 @@ export default function Home() {
       setIsError(false)
       
       // Trigger confetti celebration!
-      triggerConfetti()
+      setIsExploding(true)
+      // Reset confetti after animation completes
+      setTimeout(() => setIsExploding(false), 3000)
 
     } catch (error) {
       setMessage(`Oops! Request failed: ${error.message}. But don't worry, we can try again!`)
@@ -308,13 +282,25 @@ export default function Home() {
               className={styles.input}
               disabled={loading}
             />
-            <button 
-              type="submit" 
-              className={styles.button}
-              disabled={loading}
-            >
-              {loading ? '🔄 Scraping with love...' : '✨ Scrape Reviews ✨'}
-            </button>
+            <div style={{ position: 'relative' }}>
+              {isExploding && (
+                <ConfettiExplosion
+                  force={1}
+                  duration={3000}
+                  particleCount={500}
+                  width={2000}
+                  colors={['#FFC700', '#FF0000', '#2E3191', '#41BBC7', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#ffb6c1', '#ff69b4']}
+                  zIndex={9999}
+                />
+              )}
+              <button 
+                type="submit" 
+                className={styles.button}
+                disabled={loading}
+              >
+                {loading ? 'Scraping...' : '✨ Scrape Reviews ✨'}
+              </button>
+            </div>
           </form>
 
           {message && (
