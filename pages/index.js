@@ -207,40 +207,6 @@ export default function Home() {
                   Export to CSV
                 </button>
               </div>
-              
-              <div className={styles.tableContainer}>
-                <table className={styles.reviewsTable}>
-                  <thead>
-                    <tr>
-                      <th>Recommended</th>
-                      <th>Rating</th>
-                      <th>Title</th>
-                      <th>Review Text</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {extractedReviews.map((review, index) => (
-                      <tr key={index}>
-                        <td className={styles.recommendedCell}>
-                          <span className={`${styles.recommendedBadge} ${review.recommended === 'Yes' ? styles.recommendedYes : styles.recommendedNo}`}>
-                            {review.recommended}
-                          </span>
-                        </td>
-                        <td className={styles.ratingCell}>
-                          <span className={styles.rating}>⭐ {review.rating}</span>
-                        </td>
-                        <td className={styles.titleCell}>{review.title}</td>
-                        <td className={styles.textCell}>
-                          {review.reviewtext.length > 150 
-                            ? review.reviewtext.substring(0, 150) + '...'
-                            : review.reviewtext
-                          }
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </div>
           )}
         </div>
