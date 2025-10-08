@@ -265,7 +265,6 @@ export default function Home() {
       <Head>
         <title>✨ JellySCRAPE! ✨</title>
         <meta name="description" content="The cutest way to scrape reviews from Sephora! 💖" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
