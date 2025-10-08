@@ -4,6 +4,27 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.container::before {
+  content: '✨';
+  position: fixed;
+  top: 10%;
+  left: 5%;
+  font-size: 2rem;
+  animation: sparkle 3s ease-in-out infinite;
+  z-index: 1;
+}
+
+.container::after {
+  content: '🌟';
+  position: fixed;
+  top: 20%;
+  right: 10%;
+  font-size: 1.5rem;
+  animation: float 4s ease-in-out infinite;
+  z-index: 1;
 }
 
 .main {
@@ -12,39 +33,67 @@
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
-  background: #f8f9fa;
+  background: transparent;
   min-height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
+  position: relative;
 }
 
 .formContainer {
-  background: white;
+  background: linear-gradient(145deg, #fff5f8, #ffeef7);
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e9ecef;
+  border-radius: 25px;
+  box-shadow: 0 10px 30px rgba(255, 182, 193, 0.3), 0 0 0 3px #ffb6c1, 0 0 0 6px #ffc0cb;
+  border: 3px solid #ff69b4;
   text-align: center;
   max-width: 1200px;
   width: 100%;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
+  position: relative;
+  animation: float 6s ease-in-out infinite;
+}
+
+.formContainer::before {
+  content: '💖';
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  font-size: 2rem;
+  animation: bounce 2s infinite;
+}
+
+.formContainer::after {
+  content: '🎀';
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  font-size: 2rem;
+  animation: bounce 2s infinite 0.5s;
 }
 
 .title {
   margin: 0 0 0.5rem 0;
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: #212529;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s linear infinite, bounce 2s infinite;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
 }
 
 .subtitle {
   margin: 0 0 1.5rem 0;
-  font-size: 1rem;
-  color: #6c757d;
+  font-size: 1.2rem;
+  color: #ff69b4;
   text-align: center;
   font-weight: 400;
+  animation: float 4s ease-in-out infinite;
 }
 
 
@@ -58,67 +107,125 @@
 .input {
   width: 100%;
   max-width: 600px;
-  padding: 0.875rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  font-size: 1.1rem;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  border: 3px solid #ffb6c1;
+  border-radius: 20px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background-color: #fff;
+  transition: all 0.3s ease;
+  background: linear-gradient(145deg, #fff, #fef7f7);
+  box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
 }
 
 .input:focus {
-  border-color: #6c757d;
-  box-shadow: 0 0 0 2px rgba(108, 117, 125, 0.1);
+  border-color: #ff69b4;
+  box-shadow: 0 0 0 5px rgba(255, 105, 180, 0.2), 0 8px 25px rgba(255, 182, 193, 0.3);
+  transform: scale(1.02);
 }
 
 .input:disabled {
-  background-color: #f8f9fa;
+  background: linear-gradient(145deg, #f8f9fa, #f0f0f0);
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .button {
-  background: #495057;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e, #ffa8a8);
   color: white;
   border: none;
-  padding: 0.875rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 6px;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  border-radius: 25px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: 150px;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.button::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite 1s;
 }
 
 .button:hover:not(:disabled) {
-  background: #343a40;
+  background: linear-gradient(45deg, #ff5252, #ff7979, #ff9f9f);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+  animation: wiggle 0.5s ease-in-out;
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
-  background: #6c757d;
+  background: linear-gradient(45deg, #ccc, #ddd);
+  transform: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .message {
   margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-weight: 500;
+  padding: 1rem;
+  border-radius: 20px;
+  font-weight: 600;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  animation: float 3s ease-in-out infinite;
+  position: relative;
+}
+
+.message::before {
+  content: '💫';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.message::after {
+  content: '💫';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite 1s;
 }
 
 .message:not(:empty) {
-  background-color: #e8f5e8;
+  background: linear-gradient(145deg, #e8f5e8, #d4f1d4);
   color: #2d5a2d;
-  border: 1px solid #d1e7dd;
+  border: 3px solid #4caf50;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
 }
 
 .message.error {
-  background-color: #f8f0f0;
+  background: linear-gradient(145deg, #f8f0f0, #fce4ec);
   color: #721c24;
-  border: 1px solid #f1b0b7;
+  border: 3px solid #f44336;
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.2);
 }
 
 .responseContainer {
@@ -170,50 +277,85 @@
 
 .paginationInfo {
   margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
+  padding: 1rem;
+  background: linear-gradient(145deg, #fff5f8, #ffeef7);
+  border-radius: 15px;
+  border: 3px solid #ffb6c1;
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
+  animation: float 4s ease-in-out infinite;
 }
 
 .paginationInfo h3 {
-  margin: 0 0 0.25rem 0;
-  color: #495057;
-  font-size: 0.9rem;
-  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #ff69b4;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  text-align: center;
+  animation: bounce 2s infinite;
 }
 
 .paginationInfo p {
-  margin: 0.125rem 0;
-  font-size: 0.8rem;
-  color: #6c757d;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #ff1493;
+  display: inline-block;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  font-weight: 600;
+  text-align: center;
+  margin-right: 1.5rem;
 }
 
 .progressBar {
   width: 100%;
-  height: 6px;
-  background-color: #e0e0e0;
-  border-radius: 3px;
+  height: 8px;
+  background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+  border-radius: 5px;
   overflow: hidden;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+  border: 2px solid #ffb6c1;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .progressFill {
   height: 100%;
-  background: #6c757d;
-  transition: width 0.3s ease;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e, #ffa8a8, #ffb6c1);
+  background-size: 200% 200%;
+  animation: rainbow 2s linear infinite;
+  transition: width 0.5s ease;
+  border-radius: 8px;
+  position: relative;
+}
+
+.progressFill::after {
+  content: '✨';
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  animation: sparkle 1s ease-in-out infinite;
 }
 
 .reviewsContainer {
   margin-top: 1.5rem;
   text-align: left;
+  background: linear-gradient(145deg, #fff5f8, #ffeef7);
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 3px solid #ffb6c1;
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
+  animation: float 5s ease-in-out infinite;
 }
 
 .reviewsContainer h3 {
-  margin: 0 0 0.75rem 0;
-  color: #212529;
-  font-size: 1rem;
-  font-weight: 500;
+  margin: 0 0 1rem 0;
+  color: #ff69b4;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  text-align: center;
+  animation: bounce 2s infinite;
 }
 
 .reviewsList {
@@ -309,20 +451,133 @@
 }
 
 .exportButton {
-  background: #495057;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 6px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
+
 .exportButton:hover {
-  background: #343a40;
+  background: linear-gradient(45deg, #26a69a, #00695c);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(78, 205, 196, 0.4);
+  animation: wiggle 0.5s ease-in-out;
+}
+
+.tableContainer {
+  overflow: auto;
+  border: 3px solid #ffb6c1;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #fff, #fef7f7);
+  max-height: 400px;
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
+}
+
+.reviewsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+}
+
+.reviewsTable th {
+  background: linear-gradient(145deg, #ffb6c1, #ffc0cb);
+  color: #ff1493;
+  font-weight: 700;
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 3px solid #ff69b4;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.reviewsTable td {
+  padding: 0.75rem;
+  border-bottom: 2px solid #ffeef7;
+  vertical-align: top;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+}
+
+.reviewsTable tr:hover {
+  background: linear-gradient(145deg, #fff5f8, #ffeef7);
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.recommendedCell {
+  width: 100px;
+}
+
+.recommendedBadge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  min-width: 50px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  border: 2px solid;
+  animation: bounce 2s infinite;
+}
+
+.recommendedYes {
+  background: linear-gradient(145deg, #e8f5e8, #d4f1d4);
+  color: #2d5a2d;
+  border-color: #4caf50;
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+}
+
+.recommendedNo {
+  background: linear-gradient(145deg, #f8f0f0, #fce4ec);
+  color: #721c24;
+  border-color: #f44336;
+  box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
+}
+
+.ratingCell {
+  width: 80px;
+}
+
+.rating {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-block;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  border: 2px solid #ff5252;
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+.titleCell {
+  min-width: 150px;
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+.textCell {
+  min-width: 200px;
+  max-width: 300px;
+  word-wrap: break-word;
+  line-height: 1.3;
 }
 
 
@@ -361,4 +616,27 @@
     margin-top: 0.5rem;
   }
   
+  .tableContainer {
+    max-height: 250px;
+    font-size: 0.8rem;
+  }
+  
+  .reviewsTable th,
+  .reviewsTable td {
+    padding: 0.4rem 0.25rem;
+  }
+  
+  .titleCell,
+  .textCell {
+    min-width: 120px;
+    max-width: 150px;
+  }
+  
+  .recommendedCell {
+    width: 80px;
+  }
+  
+  .ratingCell {
+    width: 60px;
+  }
 }

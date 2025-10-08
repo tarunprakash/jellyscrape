@@ -2,6 +2,79 @@ import { useState } from 'react'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
+// Exponential backoff utility function
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Confetti celebration function
+const triggerConfetti = () => {
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#ffb6c1', '#ff69b4']
+  const confettiCount = 150
+  
+  for (let i = 0; i < confettiCount; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div')
+      confetti.style.position = 'fixed'
+      confetti.style.width = '10px'
+      confetti.style.height = '10px'
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+      confetti.style.left = Math.random() * 100 + 'vw'
+      confetti.style.top = '-10px'
+      confetti.style.borderRadius = '50%'
+      confetti.style.pointerEvents = 'none'
+      confetti.style.zIndex = '9999'
+      confetti.style.animation = 'confettiFall 3s linear forwards'
+      
+      document.body.appendChild(confetti)
+      
+      // Remove confetti after animation
+      setTimeout(() => {
+        if (confetti.parentNode) {
+          confetti.parentNode.removeChild(confetti)
+        }
+      }, 3000)
+    }, i * 10)
+  }
+}
+
+const fetchWithRetry = async (url, options = {}, maxRetries = 3, baseDelay = 1000) => {
+  let lastError
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options)
+      
+      // If response is successful, return it
+      if (response.ok) {
+        return response
+      }
+      
+      // If it's a client error (4xx), don't retry
+      if (response.status >= 400 && response.status < 500) {
+        throw new Error(`Client error: ${response.status} ${response.statusText}`)
+      }
+      
+      // For server errors (5xx) or network issues, throw error to trigger retry
+      throw new Error(`Server error: ${response.status} ${response.statusText}`)
+      
+    } catch (error) {
+      lastError = error
+      
+      // If this is the last attempt, throw the error
+      if (attempt === maxRetries) {
+        throw error
+      }
+      
+      // Calculate delay with exponential backoff and jitter
+      const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+      console.log(`Request failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${Math.round(delay)}ms...`)
+      
+      await sleep(delay)
+    }
+  }
+  
+  throw lastError
+}
+
 export default function Home() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -12,7 +85,7 @@ export default function Home() {
   const [paginationInfo, setPaginationInfo] = useState(null)
   const [currentPage, setCurrentPage] = useState(0)
 
-  const fetchReviews = async (pid, offset = 0, limit = 100) => {
+  const fetchReviews = async (pid, offset = 0, limit = 100, onRetry = null) => {
     const baseUrl = 'https://api.bazaarvoice.com/data/reviews.json'
     const params = new URLSearchParams({
       'Filter': 'contentlocale:en*',
@@ -27,40 +100,63 @@ export default function Home() {
       'Locale': 'en_US'
     })
 
-    const response = await fetch(`${baseUrl}?${params}`, {
+    // Create a custom retry function that provides user feedback
+    const fetchWithUserFeedback = async (url, options = {}, maxRetries = 3, baseDelay = 1000) => {
+      let lastError
+      
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await fetch(url, options)
+          
+          if (response.ok) {
+            return response
+          }
+          
+          if (response.status >= 400 && response.status < 500) {
+            throw new Error(`Client error: ${response.status} ${response.statusText}`)
+          }
+          
+          throw new Error(`Server error: ${response.status} ${response.statusText}`)
+          
+        } catch (error) {
+          lastError = error
+          
+          if (attempt === maxRetries) {
+            throw error
+          }
+          
+          const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+          
+          // Provide user feedback about retry attempts
+          if (onRetry) {
+            onRetry(attempt + 1, maxRetries + 1, Math.round(delay))
+          }
+          
+          await sleep(delay)
+        }
+      }
+      
+      throw lastError
+    }
+
+    const response = await fetchWithUserFeedback(`${baseUrl}?${params}`, {
       method: 'GET',
       mode: 'cors',
-    })
-
-    if (!response.ok) {
-      throw new Error(`Request failed with status: ${response.status} ${response.statusText}`)
-    }
+    }, 3, 1000)
 
     return await response.json()
   }
 
   const extractPidFromUrl = (url) => {
     try {
-      // Remove query parameters and fragments
-      const cleanUrl = url.split('?')[0].split('#')[0]
+      // Split by question mark and take the first part
+      const beforeQuestionMark = url.split('?')[0]
       
-      // Look for pattern: -P[digits] at the end of the URL
-      const match = cleanUrl.match(/-P(\d+)$/)
+      // Split by dash and take the last part
+      const parts = beforeQuestionMark.split('-')
+      const lastPart = parts[parts.length - 1]
       
-      if (match) {
-        return match[1] // Return just the digits
-      }
-      
-      // Alternative pattern: look for P followed by digits anywhere in the last segment
-      const segments = cleanUrl.split('/')
-      const lastSegment = segments[segments.length - 1]
-      const altMatch = lastSegment.match(/P(\d+)/)
-      
-      if (altMatch) {
-        return altMatch[1]
-      }
-      
-      return null
+      return lastPart || null
     } catch (error) {
       return null
     }
@@ -104,14 +200,14 @@ export default function Home() {
     e.preventDefault()
     
     if (!url.trim()) {
-      setMessage('Please enter a product URL to continue')
+      setMessage('💕 Oops! Please enter a product URL to continue, pretty please! 💕')
       setIsError(true)
       return
     }
     
     const productId = extractPidFromUrl(url.trim())
     if (!productId) {
-      setMessage('Could not extract Product ID from URL. Please check the URL format.')
+      setMessage('🤔 Hmm, I couldn\'t find the Product ID in that URL. Could you double-check it for me? 💖')
       setIsError(true)
       return
     }
@@ -132,9 +228,11 @@ export default function Home() {
       let currentPageNum = 0
 
       while (true) {
-        setMessage(`Fetching page ${currentPageNum + 1}... (${allReviewsData.length} reviews collected so far)`)
+        setMessage('')
         
-        const data = await fetchReviews(productId, offset, limit)
+        const data = await fetchReviews(productId, offset, limit, (attempt, maxAttempts, delay) => {
+          setMessage('')
+        })
         
         if (!data.Results || data.Results.length === 0) {
           break
@@ -144,6 +242,13 @@ export default function Home() {
         totalResults = data.TotalResults || totalResults
         currentPageNum++
         setCurrentPage(currentPageNum)
+
+        // Update all reviews state in real-time
+        setAllReviews(allReviewsData)
+
+        // Update extracted reviews in real-time
+        const currentExtractedData = extractReviewData(allReviewsData)
+        setExtractedReviews(currentExtractedData)
 
         // Update pagination info
         setPaginationInfo({
@@ -167,11 +272,14 @@ export default function Home() {
       setAllReviews(allReviewsData)
       const extractedData = extractReviewData(allReviewsData)
       setExtractedReviews(extractedData)
-      setMessage(`Successfully collected ${allReviewsData.length} reviews from ${currentPageNum} pages!`)
+      setMessage('')
       setIsError(false)
+      
+      // Trigger confetti celebration!
+      triggerConfetti()
 
     } catch (error) {
-      setMessage(`Request failed: ${error.message}`)
+      setMessage(`Oops! Request failed: ${error.message}. But don't worry, we can try again!`)
       setIsError(true)
     } finally {
       setLoading(false)
@@ -181,22 +289,22 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Bazaarvoice Review Scraper</title>
-        <meta name="description" content="Scrape reviews from Bazaarvoice API" />
+        <title>✨ JellySCRAPE Magic! ✨</title>
+        <meta name="description" content="The cutest way to scrape reviews from Sephora! 💖" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <div className={styles.formContainer}>
-          <h1 className={styles.title}>Review Scraper</h1>
-          <p className={styles.subtitle}>Paste any product URL to extract reviews</p>
+          <h1 className={styles.title}>Welcome to JellySCRAPE!@11!!</h1>
+          <p className={styles.subtitle}>Paste ANYYY Sephora product URL to extract reviews!!!🙀🙀🙀</p>
           
           <form onSubmit={handleSubmit} className={styles.form}>
             <input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.sephora.com/product/valentino-uomo-coral-fantasy-cologne-P482759"
+              placeholder="https://www.sephora.com/product/..."
               className={styles.input}
               disabled={loading}
             />
@@ -205,7 +313,7 @@ export default function Home() {
               className={styles.button}
               disabled={loading}
             >
-              {loading ? 'Scraping...' : 'Scrape Reviews'}
+              {loading ? '🔄 Scraping with love...' : '✨ Scrape Reviews ✨'}
             </button>
           </form>
 
@@ -217,7 +325,6 @@ export default function Home() {
 
           {paginationInfo && (
             <div className={styles.paginationInfo}>
-              <h3>Progress:</h3>
               <p><strong>Total Reviews:</strong> {paginationInfo.totalResults}</p>
               <p><strong>Pages Fetched:</strong> {paginationInfo.pagesFetched}</p>
               <p><strong>Reviews Collected:</strong> {allReviews.length}</p>
@@ -232,19 +339,56 @@ export default function Home() {
             </div>
           )}
 
-          {extractedReviews.length > 0 && !loading && (
+          {extractedReviews.length > 0 && (
             <div className={styles.reviewsContainer}>
               <div className={styles.reviewsHeader}>
-                <h3>Extracted Review Data ({extractedReviews.length} reviews)</h3>
-                <button 
-                  onClick={exportToCSV}
-                  className={styles.exportButton}
-                >
-                  Export to CSV
-                </button>
+                <h3>Reviews ({extractedReviews.length})</h3>
+                {!loading && (
+                  <button 
+                    onClick={exportToCSV}
+                    className={styles.exportButton}
+                  >
+                    Export to CSV
+                  </button>
+                )}
+              </div>
+              
+              <div className={styles.tableContainer}>
+                <table className={styles.reviewsTable}>
+                  <thead>
+                    <tr>
+                      <th>Recommended</th>
+                      <th>Rating</th>
+                      <th>Title</th>
+                      <th>Review Text</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {extractedReviews.map((review, index) => (
+                      <tr key={index}>
+                        <td className={styles.recommendedCell}>
+                          <span className={`${styles.recommendedBadge} ${review.recommended === 'Yes' ? styles.recommendedYes : styles.recommendedNo}`}>
+                            {review.recommended}
+                          </span>
+                        </td>
+                        <td className={styles.ratingCell}>
+                          <span className={styles.rating}>{review.rating}</span>
+                        </td>
+                        <td className={styles.titleCell}>{review.title}</td>
+                        <td className={styles.textCell}>
+                          {review.reviewtext.length > 100 
+                            ? review.reviewtext.substring(0, 100) + '...'
+                            : review.reviewtext
+                          }
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
+
         </div>
       </main>
     </div>
