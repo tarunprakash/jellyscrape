@@ -375,6 +375,10 @@ export default function Home() {
             </div>
           )}
 
+          {/* Subtle footer message */}
+          <div className={styles.footer}>
+            <p>made with ❤️ by TP</p>
+          </div>
         </div>
       </main>
     </div>
