@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
-  const [pid, setPid] = useState('')
+  const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
@@ -39,6 +39,33 @@ export default function Home() {
     return await response.json()
   }
 
+  const extractPidFromUrl = (url) => {
+    try {
+      // Remove query parameters and fragments
+      const cleanUrl = url.split('?')[0].split('#')[0]
+      
+      // Look for pattern: -P[digits] at the end of the URL
+      const match = cleanUrl.match(/-P(\d+)$/)
+      
+      if (match) {
+        return match[1] // Return just the digits
+      }
+      
+      // Alternative pattern: look for P followed by digits anywhere in the last segment
+      const segments = cleanUrl.split('/')
+      const lastSegment = segments[segments.length - 1]
+      const altMatch = lastSegment.match(/P(\d+)/)
+      
+      if (altMatch) {
+        return altMatch[1]
+      }
+      
+      return null
+    } catch (error) {
+      return null
+    }
+  }
+
   const extractReviewData = (reviews) => {
     return reviews.map(review => ({
       recommended: review.IsRecommended ? 'Yes' : 'No',
@@ -66,7 +93,7 @@ export default function Home() {
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `reviews_${pid}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `reviews_${extractedReviews[0] ? 'product' : 'data'}_${new Date().toISOString().split('T')[0]}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -75,8 +102,16 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!pid.trim()) {
-      setMessage('Please enter a Product ID to continue')
+    
+    if (!url.trim()) {
+      setMessage('Please enter a product URL to continue')
+      setIsError(true)
+      return
+    }
+    
+    const productId = extractPidFromUrl(url.trim())
+    if (!productId) {
+      setMessage('Could not extract Product ID from URL. Please check the URL format.')
       setIsError(true)
       return
     }
@@ -99,7 +134,7 @@ export default function Home() {
       while (true) {
         setMessage(`Fetching page ${currentPageNum + 1}... (${allReviewsData.length} reviews collected so far)`)
         
-        const data = await fetchReviews(pid.trim(), offset, limit)
+        const data = await fetchReviews(productId, offset, limit)
         
         if (!data.Results || data.Results.length === 0) {
           break
@@ -153,14 +188,15 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className={styles.formContainer}>
-          <h1 className={styles.title}>Enter Product ID</h1>
+          <h1 className={styles.title}>Review Scraper</h1>
+          <p className={styles.subtitle}>Paste any product URL to extract reviews</p>
           
           <form onSubmit={handleSubmit} className={styles.form}>
             <input
-              type="text"
-              value={pid}
-              onChange={(e) => setPid(e.target.value)}
-              placeholder="P511300"
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.sephora.com/product/valentino-uomo-coral-fantasy-cologne-P482759"
               className={styles.input}
               disabled={loading}
             />

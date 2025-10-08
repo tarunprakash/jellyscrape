@@ -32,12 +32,21 @@
 }
 
 .title {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: 1.75rem;
   font-weight: 500;
   color: #212529;
   text-align: center;
 }
+
+.subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  color: #6c757d;
+  text-align: center;
+  font-weight: 400;
+}
+
 
 .form {
   display: flex;
@@ -48,7 +57,7 @@
 
 .input {
   width: 100%;
-  max-width: 300px;
+  max-width: 600px;
   padding: 0.875rem 1rem;
   font-size: 1rem;
   border: 1px solid #dee2e6;
@@ -85,14 +94,10 @@
   background: #343a40;
 }
 
-.button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
 .button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
+  background: #6c757d;
 }
 
 .message {
@@ -105,15 +110,15 @@
 }
 
 .message:not(:empty) {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+  border: 1px solid #d1e7dd;
 }
 
 .message.error {
-  background-color: #f8d7da;
+  background-color: #f8f0f0;
   color: #721c24;
-  border: 1px solid #f5c6cb;
+  border: 1px solid #f1b0b7;
 }
 
 .responseContainer {
@@ -195,7 +200,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  background: #6c757d;
   transition: width 0.3s ease;
 }
 
@@ -206,8 +211,9 @@
 
 .reviewsContainer h3 {
   margin: 0 0 0.75rem 0;
-  color: #333;
-  font-size: 1.1rem;
+  color: #212529;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .reviewsList {
@@ -303,25 +309,20 @@
 }
 
 .exportButton {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #495057;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease;
   white-space: nowrap;
 }
 
 .exportButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);
-}
-
-.exportButton:active {
-  transform: translateY(0);
+  background: #343a40;
 }
 
 
@@ -337,7 +338,7 @@
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
   
   .input {
